@@ -15,7 +15,7 @@ function validToken(value){const a=Buffer.from(value||''),b=Buffer.from(secret);
 const srv=createServer(async(req,res)=>{
 try{
  const url=new URL(req.url,'http://localhost'), path=url.pathname;
- if(path==='/'&&req.method==='GET'){res.writeHead(200,{'content-type':'text/html; charset=utf-8'});res.end(await readFile(new URL('../public/index.html',import.meta.url),'utf8'));return;}
+ if(req.method==='GET' && ({'/':'index.html','/app':'app.html','/styles.css':'styles.css','/app.js':'app.js'})[path]){const fileName=({'/':'index.html','/app':'app.html','/styles.css':'styles.css','/app.js':'app.js'})[path];const mime=fileName.endsWith('.css')?'text/css; charset=utf-8':fileName.endsWith('.js')?'text/javascript; charset=utf-8':'text/html; charset=utf-8';res.writeHead(200,{'content-type':mime,'X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"});res.end(await readFile(new URL('../public/'+fileName,import.meta.url)));return;}
  if(path==='/health'&&req.method==='GET')return send(res,200,{ok:true});
  if(!secret || !validToken(req.headers.authorization?.replace(/^Bearer /i,'')))return send(res,401,{error:'Configure NEXFLOW_API_TOKEN e envie Bearer token'});
  if(path==='/api/workflows'&&req.method==='GET')return send(res,200,db.workflows.map(({webhookToken,...x})=>x));
