@@ -1,7 +1,7 @@
 import {createServer} from 'node:http';
 import {readFile,writeFile} from 'node:fs/promises';
 import {randomUUID,randomBytes,timingSafeEqual} from 'node:crypto';
-import {runWorkflow,validateWorkflow} from './engine.js';
+import {runWorkflowAsync,validateWorkflow} from './engine.js';
 const file = new URL('../data.json',import.meta.url);
 const host=process.env.HOST || '127.0.0.1', port=Number(process.env.PORT || 3100);
 const secret=process.env.NEXFLOW_API_TOKEN || '';
@@ -28,7 +28,7 @@ try{
  if(req.method==='GET'&&!match[2])return send(res,200,w);
  if(req.method==='PUT'&&!match[2]){const next=await body(req);validateWorkflow(next);Object.assign(w,{name:next.name,nodes:next.nodes,edges:next.edges});await save();return send(res,200,w);}
  if(req.method==='DELETE'&&!match[2]){db.workflows=db.workflows.filter(x=>x.id!==w.id);await save();return send(res,200,{ok:true});}
- if(req.method==='POST'&&match[2]){const result=runWorkflow(w,await body(req));const run={id:randomUUID(),workflowId:w.id,time:new Date().toISOString(),...result};db.runs.unshift(run);db.runs=db.runs.slice(0,300);await save();return send(res,200,run);}
+ if(req.method==='POST'&&match[2]){const result=await runWorkflowAsync(w,await body(req));const run={id:randomUUID(),workflowId:w.id,time:new Date().toISOString(),...result};db.runs.unshift(run);db.runs=db.runs.slice(0,300);await save();return send(res,200,run);}
  }
  if(path==='/api/runs'&&req.method==='GET')return send(res,200,db.runs);
  return send(res,404,{error:'Rota não encontrada'});
