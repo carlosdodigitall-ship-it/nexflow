@@ -1,1 +1,22 @@
-{"version":2,"outputDirectory":"public","rewrites":[{"source":"/app","destination":"/app.html"},{"source":"/terms","destination":"/terms.html"},{"source":"/privacy","destination":"/privacy.html"}]}
+{
+  "version": 2,
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/assistant",
+      "destination": "/assistant.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    }
+  ]
+}
